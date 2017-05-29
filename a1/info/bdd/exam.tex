@@ -270,12 +270,12 @@
         \end{itemize}
     \end{defi}
 
-    \begin{theo}[Théorème de Tarjan et Yannakabis]
+    \begin{theo}[Théorème de Tarjan et Yannakakis]
         L'arbre de jointure d'une requête peut être obtenu en temps linéaire
         s'il existe.
     \end{theo}
 
-    \begin{theo}[Algorithme de Yannakabis]
+    \begin{theo}[Algorithme de Yannakakis]
         % TODO détail de l'algorithme
         Une requête $\alpha$-acyclique s'évalue en temps combiné polynomial.
     \end{theo}
@@ -330,7 +330,20 @@
 
     \section{Théorie de la normalisation}
     
-    % TODO 3NF et BCNF definitions
+    \begin{defi}[3NF]
+      Une relation $R$ est en 3NF si pour toute FD $A_1,...,A_n \rightarrow B$,
+      $A_1,...,A_n$ est une super-clé de $R$, ou $B$ fait partie d'une clé
+    \end{defi}
+
+    \begin{defi}[BCNF]
+      Une relation $R$ est en BCNF si pour toute FD $A_1,...,A_n \rightarrow B$,
+      $A_1,...,A_n$ est une super-clé de $R$.
+    \end{defi}
+
+    \begin{defi}[4NF] 
+      Une relation $R$ est en 4NF si pour toute MVD $A_1,...,A_n
+      \twoheadrightarrow B_1,...,B_n$, alors $A_1,...,A_n$ est une super clé.
+    \end{defi}
 
     \section{Analyse statique de requêtes}
 
