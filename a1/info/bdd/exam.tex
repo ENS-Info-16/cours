@@ -38,6 +38,7 @@
 \newcommand{\T}{\mathscr{T}}
 \newcommand{\Q}{\mathscr{Q}}
 \renewcommand{\H}{\mathscr{H}}
+\renewcommand{\P}{\mathscr{P}}
 \newcommand{\Er}{\mathscr{E}}
 \newcommand{\parts}{\mathscr{P}}
 \newcommand{\ntoi}{{n\rightarrow\infty}}
@@ -46,6 +47,7 @@
 \newcommand{\R}{\mathbb{R}}
 \newcommand{\E}{\mathbb{E}}
 \newcommand{\1}{\mathbbm{1}}
+\newcommand{\0}{\mathbbm{0}}
 \renewcommand{\phi}{\varphi}
 
 \newtheorem{theo}{Théorème}
@@ -53,6 +55,7 @@
 \newtheorem{prop}{Proposition}
 \newtheorem{defi}{Définition}
 \newtheorem{fact}{Faits}
+\newtheorem{ex}{Exemple}
 
 \begin{document}
 \begin{multicols}{2}
@@ -383,6 +386,65 @@
     \begin{theo} L'inclusion et l'équivalence de requêtes du calcul relationnel
         sont indécidables et co-récursivement énumérables.
     \end{theo}
+
+    \section{Vues, provenance, déclencheurs}
+
+    \begin{defi}[Vues] Requêtes auxquelles on donne un nom, s'utilisent comme
+        des tables dans d'autres requêtes. Il en existe deux types :\begin{itemize}
+            \item Virtuelle : la requête est réévaluée à chaque utilisation.
+            \item Matérialisée : la requête est évaluée à sa création et le résultat
+                est stocké.
+        \end{itemize}
+    \end{defi}
+
+    \begin{defi}[Provenance]
+        Soit $\chi = \{x_1, \ldots x_n\}$ un ensemble fini d'évènements booléen.
+        On nomme une annotation de provenance une fonction booléenne sur $\chi$,
+        de type $\nu : (\chi \rightarrow \{\top,\bot\})\rightarrow \{\top,\bot\}$.
+
+        On note $\nu(D)$ la sous instance de D ne contenant que tuples évalués à
+        $\top$. La provenance booléenne d'un tuple $t\in q(D)$ pour une requête
+        $q$ est :
+        \[ \text{prov}_{q,D}(t) : \nu\mapsto\left\{\begin{array}{cl}
+            \top & \text{si } t\in q(\nu(D)) \\
+            \bot & \text{sinon} \\
+        \end{array}\right.\]
+    \end{defi}
+
+    \begin{defi}[Semi-anneau commutatif] Un ensemble $(K, \0, \1, \oplus, \otimes)$
+        est un semi anneau commutatif si $\oplus$ est associatif, commutatif et
+        de neutre $\0_K$, $\otimes$ est associatif, commutatif et de neutre
+        $\1_K$, $\otimes$ distribue sur $\oplus$ et $\0$ est annulateur pour
+        $\otimes$.
+    \end{defi}
+
+    \begin{ex}[Semi-anneau Why]
+        $(\P(\P(\chi)), \emptyset, \{\emptyset\}, \cup, \Cup)$, où
+        $A\Cup B = \{a\cup b | a\in A, b\in B\}$.
+    \end{ex}
+
+    \begin{defi}[Provenance de semi-anneau]
+        Soit $(K, \0, \1, \oplus, \otimes)$ un semi anneau. On suppose les annotations
+        de provenance dans $K$. On considère une requête $q$ de l'algèbre relationnelle
+        positive. On définit la sémantique de la provenance d'un tuple $t\in q(D)$
+        récursivement sur $q$: \begin{itemize}
+            \item sélection, renommage : on ne change rien.
+            \item projection, union : on fusionne avec $\oplus$
+            \item produit cartésien ; on fusionne avec $\otimes$
+        \end{itemize}
+    \end{defi}
+
+    \begin{fact}[Mise à jour de vue] Pour l'insertion, une mise à jour incrémentale
+        est possible pour les requêtes de l'algèbre relationnelle positive. Pour
+        la suppression, il suffit d'utiliser la provenance booléenne.
+    \end{fact}
+    
+    \begin{defi}[Déclencheurs]
+        Fonctions exécutées avant, après ou à la place d'une mise à jour sur une
+        table ou une vue.
+    \end{defi}
+
+    \section{Évaluation et optimisation des requêtes}
 
 \end{multicols}
 \end{document}
