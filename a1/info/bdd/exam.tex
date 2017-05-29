@@ -33,11 +33,11 @@
 \newcommand{\B}{\mathscr{B}}
 \newcommand{\C}{\mathscr{C}}
 \newcommand{\G}{\mathscr{G}}
-\newcommand{\L}{\mathscr{L}}
+\renewcommand{\L}{\mathscr{L}}
 \newcommand{\V}{\mathscr{V}}
 \newcommand{\T}{\mathscr{T}}
 \newcommand{\Q}{\mathscr{Q}}
-\newcommand{\H}{\mathscr{H}}
+\renewcommand{\H}{\mathscr{H}}
 \newcommand{\Er}{\mathscr{E}}
 \newcommand{\parts}{\mathscr{P}}
 \newcommand{\ntoi}{{n\rightarrow\infty}}
@@ -75,7 +75,7 @@
     \begin{defi}[Schéma de relation d'arité $n$]0
         Soient $\L$ les étiquettes, $\V$ les valeurs et $\T\subset\P(\V)$ les types
         des ensembles infinis dénombrables. Un schéma de relation est un $n$-uplet
-        $(A_i)_{1\leq i \leq n}\in(\L\cross \T)^n$ tel que $A_i\neq A_j$ pour tout
+        $(A_i)_{1\leq i \leq n}\in(\L\times \T)^n$ tel que $A_i\neq A_j$ pour tout
         $1\leq i,j\leq n$.
     \end{defi}
 
@@ -102,7 +102,7 @@
             $\rho_{A\rightarrow B}$ & 1 & Renommage & $A,B\in\L$ \\
             $\Pi_{A_1,\ldots A_n}$ & 1 & Projection & $A_i\in\L$ \\
             $\sigma_\phi$ & 1 & Sélection & $\phi$ formule \\
-            $\cross$ & 2 & Produit cartésien & \\
+            $\times$ & 2 & Produit cartésien & \\
             $\cup$ & 2 & Union & \\
             $\backslash$ & 2 & Différence & \\
             $\bowtie_\phi$ & 2 & Jointure & $\phi$ formule \\
@@ -201,7 +201,7 @@
 
     \begin{defi}[Dépendance multivaluée (MVD)]
         $r\models X\twoheadrightarrow Y$ si, pour $Z$ les attributs de $R$ hors
-        $X\cup Y$, $\forall t, t'\in R, t[X] = t[X'] \imples \exists t''\in r:
+        $X\cup Y$, $\forall t, t'\in R, t[X] = t[X'] \implies \exists t''\in r:
         t''[Y] = t[y] \wedge t''[Z] = t'[Z]$
     \end{defi}
 
@@ -220,7 +220,7 @@
     \end{theo}
 
     \begin{defi}[Dépendances génératrices d'égalités (EGD)]
-        $\forall x_1,\ldots x_n, \phi(x_1,\ldots x_n)\imples \psi(x_1,\ldots x_n)$
+        $\forall x_1,\ldots x_n, \phi(x_1,\ldots x_n)\implies \psi(x_1,\ldots x_n)$
         avec $\phi$ une CQ et $\psi$ une conjonction d'égalités. Les EGD généralisent
         les FD.
     \end{defi}
@@ -241,7 +241,7 @@
 
     \begin{defi}[Inclusion]
         Une requête $q$ est incluse dans une requête $q'$ (noté $q\sqsubseteq q'$)
-        si pour toute base de données $D$, $q(D)\subseqeq q'(D)$.
+        si pour toute base de données $D$, $q(D)\subseteq q'(D)$.
     \end{defi}
 
     \begin{prop}[Équivalence et inclusion]
