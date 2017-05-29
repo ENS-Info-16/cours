@@ -1,0 +1,297 @@
+\documentclass[landscape]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[francais]{babel}
+\usepackage[left=1cm, right=1cm, bottom=1cm, top=1cm]{geometry}
+\usepackage{fixltx2e}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathrsfs}
+\usepackage{stmaryrd}
+\usepackage{bbm}
+\usepackage[dvipsnames]{xcolor}
+\usepackage[object=vectorian]{pgfornament}
+\usetikzlibrary{shapes.geometric,calc}
+\usepackage{algorithm2e}
+\usepackage{multicol}
+\newcommand{\sep}{\begin{center}
+    \pgfornament[width=0.25\linewidth]{84}
+\end{center}}
+\newcommand{\edornament}{\begin{center}
+    \pgfornament[width=0.25\linewidth]{49}
+\end{center}}
+\newcommand{\seg}[2]{\llbracket #1, #2 \rrbracket}
+
+\MakeRobust{\overrightarrow}
+
+\newcommand{\vc}[1]{\overrightarrow{#1}}
+\newcommand{\A}{\mathscr{A}}
+\newcommand{\F}{\mathscr{F}}
+\newcommand{\B}{\mathscr{B}}
+\newcommand{\C}{\mathscr{C}}
+\newcommand{\G}{\mathscr{G}}
+\newcommand{\L}{\mathscr{L}}
+\newcommand{\V}{\mathscr{V}}
+\newcommand{\T}{\mathscr{T}}
+\newcommand{\Q}{\mathscr{Q}}
+\newcommand{\H}{\mathscr{H}}
+\newcommand{\Er}{\mathscr{E}}
+\newcommand{\parts}{\mathscr{P}}
+\newcommand{\ntoi}{{n\rightarrow\infty}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\1}{\mathbbm{1}}
+\renewcommand{\phi}{\varphi}
+
+\newtheorem{theo}{Théorème}
+\newtheorem{lem}{Lemme}
+\newtheorem{prop}{Proposition}
+\newtheorem{defi}{Définition}
+\newtheorem{fact}{Faits}
+
+\begin{document}
+\begin{multicols}{2}
+
+    \section{Introduction}
+
+    \begin{defi}[SGBD] Fonctionnalités : indépendance physique/logique, accès aisé
+        aux données, optimisation de requêtes, intégrité logique/physique,
+        partage de données, normalisation.
+    \end{defi}
+
+    \begin{defi}[ACID] Atomicité, Cohérence, Isolation, Durabilité.
+    \end{defi}
+
+    \begin{fact}[Faiblesses SGBD classiques] Très grands volumes (> Po), débits
+        extrêmes (> kRequêtes/s), mal adapté à certains modèles de données, surcoût
+        de ACID.
+    \end{fact}
+
+    \begin{defi}[Schéma de relation d'arité $n$]0
+        Soient $\L$ les étiquettes, $\V$ les valeurs et $\T\subset\P(\V)$ les types
+        des ensembles infinis dénombrables. Un schéma de relation est un $n$-uplet
+        $(A_i)_{1\leq i \leq n}\in(\L\cross \T)^n$ tel que $A_i\neq A_j$ pour tout
+        $1\leq i,j\leq n$.
+    \end{defi}
+
+    \begin{defi}[Schéma relationnel] Ensemble de schéma de relations étiquetés.
+    \end{defi}
+
+    \begin{defi}[Contraintes d'intégrité] Pour une instance :\begin{itemize}
+        \item Clef : attributs d'une relation permettant d'identifier les
+            éléments de l'instance.
+        \item Clef étrangère : attributs d'une relation permettant d'identifier
+            (existence + unicité) les éléments d'une autre relation.
+        \item Contrainte Check : condition arbitraire sur les valeurs des attributs
+            d'une relation.
+    \end{itemize}\end{defi}
+
+    \section{Aspects logiques}
+
+    \begin{defi}[Algèbre relationelle : opérateurs]
+        \begin{tabular}{ccll}
+            \hline
+            Op. & Arité & Description & Condition \\
+            \hline
+            $R$ & 0 & Nom de relation & $R \in \L$ \\
+            $\rho_{A\rightarrow B}$ & 1 & Renommage & $A,B\in\L$ \\
+            $\Pi_{A_1,\ldots A_n}$ & 1 & Projection & $A_i\in\L$ \\
+            $\sigma_\phi$ & 1 & Sélection & $\phi$ formule \\
+            $\cross$ & 2 & Produit cartésien & \\
+            $\cup$ & 2 & Union & \\
+            $\backslash$ & 2 & Différence & \\
+            $\bowtie_\phi$ & 2 & Jointure & $\phi$ formule \\
+            \hline
+        \end{tabular}
+    \end{defi}
+
+    \begin{defi}[Requêtes] \begin{itemize}
+        \item Requêtes conjonctives : $x_a, x_b \leftarrow R_1(x, x_a), R_2(x', x_b, x''), R_3(x_b, x'')$
+        \item Calcul conjonctif : $\{x_a, x_b | \exists x \exists x' \exists x''(R_1(x, x_a)\wedge R_2(x', x_b, x'')\wedge R_3(x_b, x'')) \}$
+        \item Algèbre PSJR : projection, sélection, jointure, renommage.
+    \end{itemize}\end{defi}
+
+    \begin{theo}[Théorème d'équivalence PSJR]
+        Les requêtes conjonctives, le calcul conjonctif et l'algèbre PSJR permettent
+        d'exprimer les mêmes requêtes.
+    \end{theo}
+
+    \begin{theo}[Théorème d'équivalence PSJRU]
+        L'équivalence reste vraie si on ajoute l'union à l'algèbre, le $\vee$ au
+        calcul et la possibilité de mettre plusieurs requêtes.
+    \end{theo}
+
+    \begin{defi}[Sémantique domaine active]
+        On défini le domaine actif d'une instance comme l'ensemble des constantes.
+        Cette sémantique de requêtes ne renvoit que des tuples contenant des éléments
+        du domaine actif de l'instance.
+    \end{defi}
+
+    \begin{theo}[Théorème d'équivalence]
+        Algèbre, calcul et datalog (avec $\backslash$, $\forall$, et $\neg$) sont
+        équivalents.
+    \end{theo}
+
+    \section{Requêtes récursives}
+
+    % TODO ajouter récursivité et points fixes ?
+
+    \section{Complexité des langages de requête}
+
+    \begin{defi}[Capture] Un langage de requête $\Q$ capture un classe de complexité
+        $\C$ si :\begin{itemize}
+            \item pour tout $Q\in\Q$, évaluer $Q$ est dans $\C$ en complexité
+                en les données.
+            \item pour tout $P\in\C$, il existe $Q\in\Q$ dont l'évaluation
+                résoud $P$.
+        \end{itemize}
+    \end{defi}
+
+    \begin{theo}[Classes de complexité]
+        \begin{tabular}{r|cc}
+            \hline Langage & donnés & combinée \\
+            \hline
+            $CQ$ & $PTIME$ & $NP$-complet \\
+            $FO$ & $AC0\subset PTIME$ & $PSPACE$-complet \\
+            $FO+\mu^+$ & $PTIME$-complet & \\
+            $FO+\mu$ & $PSPACE$-complet & \\
+            \hline
+        \end{tabular}
+    \end{theo}
+
+    \begin{defi}[$\alpha$-acyclicité]
+        Soit $R$ une requête conjonctive. $R$ peut être vue comme un hypergraphe $\H$
+        dont les sommets sont les variables et les hyperarêtes les atomes. $R$ est
+        $\alpha$-acyclique si $H$ admet un arbre de jointure, ie un arbre vérifiant :
+        \begin{itemize}
+            \item chaque hyperarête de $\H$ apparait comme étiquette d'un noeud de l'arbre.
+            \item pour chaque sommet $x$ de $\H$, l'ensemble des noeuds de l'arbre étiquetés
+                par une arêtes incluant $x$ est un sous-arbre connexe.
+        \end{itemize}
+    \end{defi}
+
+    \begin{theo}[Théorème de Tarjan et Yannakabis]
+        L'arbre de jointure d'une requête peut être obtenu en temps linéaire
+        s'il existe.
+    \end{theo}
+
+    \begin{theo}[Algorithme de Yannakabis]
+        % TODO détail de l'algorithme
+        Une requête $\alpha$-acyclique s'évalue en temps combiné polynomial.
+    \end{theo}
+
+    \begin{theo} $FO+\mu^+$ capture $PTIME$ sur les données avec un ordre total sur
+        les éléments du domaine.
+        
+        $FO+\mu$ capture $PSPACE$ sur les données avec un ordre total sur les éléments
+        du domaine.
+    \end{theo}
+
+    \section{Contraintes et poursuite}
+
+    \begin{defi}[Dépendance fonctionnelle (FD)]
+        Une instance $r$ vérifie $X\rightarrow Y$, noté $x\models X\rightarrow Y$,
+        si $\forall t, t'\in r, t[X] = t[X']\implies t[y] = t'[y]$.
+    \end{defi}
+
+    \begin{defi}[Dépendance multivaluée (MVD)]
+        $r\models X\twoheadrightarrow Y$ si, pour $Z$ les attributs de $R$ hors
+        $X\cup Y$, $\forall t, t'\in R, t[X] = t[X'] \imples \exists t''\in r:
+        t''[Y] = t[y] \wedge t''[Z] = t'[Z]$
+    \end{defi}
+
+    \begin{defi}[Algorithme de poursuite]
+        Décide si une dépendance est impliquée par un ensemble de dépendances, en
+        partant d'une instance pour une relation avec deux éléments, puis en ajoutant
+        des éléments en utilisant les dépendances initiale jusqu'à obtenir une instance
+        vérifiant ces dépendances. Si la dépendance finale est vérifiée, alors
+        elle est impliquée, sinon l'instance créée est un contre-exemple.
+    \end{defi}
+
+    \begin{theo}[Maier]
+        La poursuite par des FD et MVD termine toujours après un nombre fini
+        d'opérations, et contruit un contre-exemple si et seulement s'il en
+        existe un.
+    \end{theo}
+
+    \begin{defi}[Dépendances génératrices d'égalités (EGD)]
+        $\forall x_1,\ldots x_n, \phi(x_1,\ldots x_n)\imples \psi(x_1,\ldots x_n)$
+        avec $\phi$ une CQ et $\psi$ une conjonction d'égalités. Les EGD généralisent
+        les FD.
+    \end{defi}
+
+    \begin{defi}[Dépendances génératrices de tuples (TGD)]
+        $\forall x_1,\ldots x_n, \phi(x_1,\ldots x_n)\implies\exists y_1,\ldots y_m, \psi(x_1,\ldots x_n, y_1, \ldots y_m)$
+        avec $\phi$ et $\psi$ des CQ. Les TGD généralisent les MVD et les ID
+        (clefs étrangères).
+    \end{defi}
+
+    % TODO poursuite générale
+
+    \section{Théorie de la normalisation}
+    
+    % TODO 3NF et BCNF definitions
+
+    \section{Analyse statique de requêtes}
+
+    \begin{defi}[Inclusion]
+        Une requête $q$ est incluse dans une requête $q'$ (noté $q\sqsubseteq q'$)
+        si pour toute base de données $D$, $q(D)\subseqeq q'(D)$.
+    \end{defi}
+
+    \begin{prop}[Équivalence et inclusion]
+        $q\equiv q' \iff q\sqsubseteq q'\wedge q'\sqsubseteq q$
+    \end{prop}
+
+    \begin{defi}[Homomorphisme]
+        Un homomorphisme $\phi$ d'une CQ $q$ dans une CQ $q'$ est une fonction
+        des variables de $q$ dans celles de $q'$ telle que pour tout atome
+        $R(z_i)$ de $q$, il existe un atome $R(z'_{i'})$ dans $q'$ avec
+        $\phi(z_i) = z'_{i'}$.
+
+        Un isomorphisme est un homomorphisme bijectif dont la bijection réciproque
+        est un homomorphisme.
+    \end{defi}
+
+    \begin{defi}[Instance associée à une requête] Soit $q(x) \leftarrow \exists y:
+        R_1(z_1)\wedge\ldots\wedge R_n(z_n)$ une CQ. On peut construire $I_q$
+        sont instance associée de domaine actif $\{a_z | z\in x\cup y\}$
+        formée des $n$ tuples $R(a_{z_{i1}}, \ldots a_{z_{ik}})$ pour
+        $R(z_{i1}, \ldots z_{ik})$ atome de $q$.
+    \end{defi}
+
+    \begin{prop} Il existe une homomorphisme de $q(x)$ dans $q'(x')$ ssi
+        $(a_{x'_1}, \ldots a_{x'_j})\in q(I_{q'})$.
+    \end{prop}
+
+    \begin{theo}[Chandra et Merlin] $q\sqsubseteq q'$ ssi il existe un homomorphisme
+        de $q'$ dans $q$.
+    \end{theo}
+
+    \begin{prop}[Chandra et Merlin] Soit $q$ une CQ. Il existe une requête $q'$
+        équivalente minimale à $q$ obtenue en enlevant des atomes à $q$.
+
+        Soient $q,q'$ deux CQ équivalentes minimales. Il existe un isomorphisme
+        de $q$ dans $q'$.
+    \end{prop}
+
+    \begin{prop} Les problèmes suivants sont $NP$-complets (en les requêtes)~: $q\sqsubseteq q'$,
+        $q \equiv q'$ et la non minimalité de $q$.
+    \end{prop}
+
+    \begin{theo}[Trakhtenbrot]
+        La satisfiabilité du calcul relationnel (dans le cadre fini) est indécidable.
+    \end{theo}
+
+    \begin{theo} L'inclusion et l'équivalence de requêtes du calcul relationnel
+        sont indécidables et co-récursivement énumérables.
+    \end{theo}
+
+\end{multicols}
+\end{document}
+
