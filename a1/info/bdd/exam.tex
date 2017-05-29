@@ -13,8 +13,8 @@
 \usepackage{stmaryrd}
 \usepackage{bbm}
 \usepackage[dvipsnames]{xcolor}
-\usepackage[object=vectorian]{pgfornament}
-\usetikzlibrary{shapes.geometric,calc}
+%\usepackage[object=vectorian]{pgfornament}
+%\usetikzlibrary{shapes.geometric,calc}
 \usepackage{algorithm2e}
 \usepackage{multicol}
 \newcommand{\sep}{\begin{center}
@@ -139,7 +139,99 @@
 
     \section{Requêtes récursives}
 
-    % TODO ajouter récursivité et points fixes ?
+    %TODO faits intensionnels/extensionnels
+    \begin{defi}[Datalog]
+      Datalog est le langage composé des requêtes conjonctives, auquels ont a
+      ajouté la récursion. Chaque règle $r$ d'un programme $P$ peut être vu
+      comme une requête conjonctive sur une base de donnée $D$. On le note
+      $S(\mathbb{b}) \leftarrow R_1(\mathbb{x}_1),...,R_n(\mathbb{x}_n)$, avec
+      $S$ une relation du schémas intensionnel, $R_1,...,R_n$ des relations du
+      schéma intensionnel ou extensionnel, $\mathbb{x}_i,\mathbb{y}$ des
+      tuples variables ou des constantes, dont les variables de $\mathbb{y}$
+      sont présentes dans au moins un $\mathbb{x}_i$
+    \end{defi}
+    
+    \begin{defi}[Datalog : Sémantique de point fixe]
+      On définit l'opérateur de conséquence 
+      $\Gamma_P(D) := D \bigcup_{r\in P}\{r(D)\}$. On considère la suite $(D_n)$
+      définie par $D_0 = D, D_{n+1} = \Gamma_P(D_n)$. La sémantique de $P$ sur
+      $D$ est l'ensemble des faits de la relation $But$ dans $D_\infty$, le
+      point fixe de la suite.
+    \end{defi}
+
+    \begin{defi}[Trellis complet]
+      Un trellis complet $L$ est un ensemble muni d'un ordre partiel dans lequel
+      tout sous-ensemble admet une borne supérieure et une borne inférieure
+    \end{defi}
+    
+    \begin{theo}[Knaster-Tarski]
+      Si $L$ est un trellis complet, et $f : L \rightarrow L$ une application
+      croissante sur $L$, alors les points fixes de $f$ forment un treillis complet.
+    \end{theo}
+
+    \begin{prop}[Application à datalog]
+      L'ensemble des parties d'un ensemble (ordonné par l'inclusion) est un
+      treillis complet. Comme $\Gamma_P$ est croissant, en appliquant le
+      théorème précédent, il existe un plus petit point fixe, obtenu par
+      l'intersection de tout les points fixes.
+    \end{prop}
+
+    \begin{defi}[Arbre de preuve]
+      On peut définir un arbre de preuve d'un tuple $But(a_1,...,a_n)$. Avec
+      $But(a_1,...,a_n)$ la racine de l'arbre, chaque noeud étant
+      l'instantiation de la tête d'une règle, et ses enfants les instantiations
+      du corps de la règle. Les feuilles sont des faits extentionnels.
+    \end{defi}
+
+    \begin{defi}[Datalog non récursif]
+      Le graphe d'un programme Datalog est le graphe dont les noeuds sont des
+      relations du schémas intensionnel, et dans lequel il existe un noeud
+      $(R,S)$ si il existe une règle avec $R$ dans le corps et $S$ dans la tête.
+      Un programme Datalog est non récursif si le graphe est acyclique.
+    \end{defi}
+
+    \begin{fact}
+      Un programme Datalog non récursif à le même pouvoir d'expression que les
+      unions de requêtes conjonctives.
+    \end{fact}
+
+    \begin{defi}[Logique inflationniste et non-inflationniste]
+      Logique non inflationniste (opérateur $:=$) plus expressive, mais logique
+      inflationniste (opérateur $+=$) ne peut pas avoir de boucles infinies.
+      Dans les deux cas, on utilise le nouvel opérateur, et la boucle ``while no
+      change do ... done''
+    \end{defi}
+
+    \begin{defi}[construction de point fixes]
+      On ajoute au calcul relationnel une construction du plus petit point fixe
+      non inflationniste
+      $\mu_T[\phi(T)](x_1,...,x_n)$, avec $x_1,...,x_n$ les variables libres de
+      $\phi(T)$, et $\phi(T)$ une formule de calcul contenant une nouvelle
+      relation $T$. La constrution du plus petit point fixe inflationniste est
+      similaire, avec la notation $\mu^+_T$. Ces opérateurs sont équivalents au
+      while associés.
+    \end{defi}
+
+    \begin{fact}[Applciation à la logique du second ordre]
+      L'opérateur de point fixe peut immédiatement se retranscrire en logique du
+      second ordre.
+    \end{fact}
+
+    \begin{fact}[Opérateur de négation]
+      Avec l'opérateur de négation, on est toujours équivalent au calcul avec
+      point fixe inflationniste, et à l'algèbre avec while inflationniste
+    \end{fact}
+
+    \begin{defi}[Syntaxe en SQL]
+      WITH RECURSIVE $T(x_1,...,x_n)$ AS ( 
+      SELECT (Cas de base)
+      UNION
+      SELECT (Cas de récursion)
+      )
+      SELECT * FROM T\\
+      La logique est inflationniste, mais si il y a des créations de variables,
+      cela peut rentrer dans une boucle infinie.
+    \end{defi}
 
     \section{Complexité des langages de requête}
 
