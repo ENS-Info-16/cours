@@ -1,0 +1,542 @@
+\documentclass[a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{listings}
+\usepackage{enumitem}
+\usepackage{relsize}
+\usepackage{dsfont}
+\usepackage{stmaryrd}
+\usepackage{graphicx}
+\usepackage[margin=1.0in]{geometry}
+
+\newtheorem*{prop}{Proposition}
+\newtheorem*{definition}{Definition}
+\newtheorem*{theorem}{Theorem}
+\renewcommand*{\proofname}{Preuve}
+
+\setlength\parindent{0pt}
+
+\newcommand{\K}{\ensuremath\mathbb{K}}
+\newcommand{\N}{\ensuremath\mathbb{N}}
+\newcommand{\Z}{\ensuremath\mathbb{Z}}
+\newcommand{\Q}{\ensuremath\mathbb{Q}}
+\newcommand{\R}{\ensuremath\mathbb{R}}
+\newcommand{\U}{\ensuremath\mathbb{U}}
+\newcommand{\C}{\ensuremath\mathbb{C}}
+\newcommand{\E}{\ensuremath\mathbb{E}}
+\newcommand{\V}{\ensuremath\mathbb{V}}
+\renewcommand{\P}{\ensuremath\mathbb{P}}
+
+\renewcommand{\le}{\leqslant}
+\renewcommand{\ge}{\geqslant}
+\renewcommand{\leq}{\leqslant}
+\renewcommand{\geq}{\geqslant}
+\renewcommand{\emptyset}{\varnothing}
+
+\renewcommand{\(}{\left(}
+\renewcommand{\)}{\right)}
+
+\newcommand{\ds}{\displaystyle}
+
+\newcommand{\la}{\leftarrow}
+\newcommand{\xla}{\xleftarrow}
+\newcommand{\ra}{\rightarrow}
+\newcommand{\xra}{\xrightarrow}
+
+\newcommand{\et}{\text{ et }}
+\newcommand{\ou}{\text{ ou }}
+\newcommand{\car}{\text{ car }}
+\newcommand{\avec}{\text{ avec }}
+
+
+\title{Traitement du signal - Fiche}
+\date{}
+\begin{document}
+
+\maketitle
+
+\section{Filtrage Analogique et transformée de Fourier}
+
+\begin{prop}[Diracs]~\\
+  $\int \delta(t)f(\tau-t)dt = f(\tau)$\\
+  $f(t) = \int \delta(u)f(t-u)dt$\\
+   Si on note $f(t) = L(\delta(t))$ avec $L$ un opérateur linéaire, on a\\
+  $L(f(t)) = \int f(u)h(t-u)du = \int f(t-u)h(u)du = h \star f(t)$
+\end{prop}
+
+
+\begin{definition}[Produit de convolution]~\\
+  $f \star g(t)$ est un produit de convolution si :\\
+  Il est commutatif, et $f \star \delta(t - \tau) = f(t - \tau)$ avec $\delta$
+  une masse de dirac
+\end{definition}
+
+\begin{definition}[Homogénéité]~\\
+  Un filtre est homogène au niveau temporel si $L(f(t)) = g(t) \implies
+  L(f(t-\tau)) = g(t-\tau)$
+\end{definition}
+
+\begin{definition}[Causalité]~\\
+  Un filtre est causal si $L(f(t)) = h(t) = 0$ si $t<0$.
+\end{definition}
+
+
+\begin{definition}[Stabilité]~\\
+  Un filtre est stable si $\int\limits_{-\infty}^{\infty}h(u)du < \infty$.\\
+  Comme $|L(f(t))| \leq \sup |f(u)| \int |h(u)| du$, il suffit que $h \in \mathbf{L}^1$
+\end{definition}
+
+
+\subsection{Transformée de Fourier dans $\mathbf{L}^1$}
+
+\begin{theorem}[Transformée de Fourier]~\\
+  Pour toute fonction dans $\mathbf{L}^1$, on note $\hat{f}(t)$ sa transformée
+  de Fourier, avec $\hat{f}(t) = \int\limits_{-\infty}^{\infty} f(t)e^{iwt}dt$
+\end{theorem}
+
+\begin{prop}[Formule de reconstruction]~\\
+  $f(t) = \frac{1}{2\pi}\int\limits_{-\infty}^{\infty} \hat{f}(w)e^{iwt}dw$
+\end{prop}
+
+\begin{prop}~\\
+  On a $|\hat{f}(w)| \leq \int\limits_{-\infty}^\infty |f(t)|dt$
+\end{prop}
+
+\begin{prop}[Propriétés]~\\
+  \begin{align*}
+    f(t) &\rightarrow \hat{f}(w)\\
+    \hat{f}(t) &\rightarrow 2\pi f(-w)\\
+    f_1 \star f_2 &\rightarrow \hat{f_1}(w) \hat{f_2}(w)\\
+    f_1(t)f_2(t) &\rightarrow \frac{1}{2\pi} \hat{f_1}\star \hat{f_2}\\
+    f(t-t_0) &\rightarrow e^{it_0w}\hat{f}(w)\\
+    e^{iw_0t}f(t) &\rightarrow \hat{f}(w-w_0)\\
+    f(at) &\rightarrow \frac{1}{|a|}\hat{f}(\frac{w}{a})\\
+    \frac{d^pf(t)}[dt^p] &\rightarrow (iw)^p\hat{f}(w)\\
+    (-it)^pf(t) &\rightarrow \frac{d^p\hat{f}(w)}{dw^p}\\
+    f^*(t) &\rightarrow \hat{f}^*(-w)\\
+    f(t) = \Re(f(t)) &\rightarrow \hat{f}(-w) = \hat{f}^*(w)\\
+    \Re(f(t)) &\rightarrow \frac{\hat{f}(w) + \hat{f}^*(-w)}{2}\\
+    \Im(f(t)) &\rightarrow \frac{\hat{f}(w) + \hat{f}^*(-w)}{2}\\
+    \frac{f(t)+f^*(-t)}{2} &\rightarrow \Re(\hat{f}(w))\\
+    \frac{f(t)-f^*(-t)}{2} &\rightarrow \Im(\hat{f}(w))
+  \end{align*}
+\end{prop}
+
+\subsection{Transformée de Fourier dans $\mathbf{L}^2$}
+
+\begin{prop}[Généralisation dans $\mathbf{L}^2$]~\\
+  La transformée de Fourier s'étends dans $\mathbf{L}^2$ par argument de densité
+\end{prop}
+
+\begin{prop}[Conservation d'énergie]~\\
+  $<f,h> = \frac{1}{2\pi}<\hat{f},\hat{h}>$ avec le produit scalaire
+  $<f,h> = \int\limits_{-\infty}^{\infty}f(t)h^*(t)dt$
+\end{prop}
+
+\subsection{Exemples de filtres}
+
+\begin{definition}[Filtre passe bas]~\\
+  Un filtre passe bas idéal est défini par $\hat{h}_0(w) = 1 \text{ si } w < w_c$, 0 sinon.\\
+  On en déduit que $h_0(w) = \frac{sin(w_ct)}{\pi t}$
+\end{definition}
+
+\begin{definition}[Filtre passe bandes]~\\
+  On définit le filtre passe bande $h_1$ de manière analogue, et on en déduit
+  que $h_1(w) = 2cos(w_0t)\frac{sin(w_ct)}{\pi t}$, avec $w_0$ le centre de la bande, et $w_c$ le rayon.
+\end{definition}
+
+\section{Traitement du signal discret}
+
+\subsection{Cas infini}
+
+\begin{prop}[Echantillonnage]~\\
+  Un échantillonnage uniforme peut se noter $f_d(t) = \sum\limits_{n=-\infty}^{\infty}f(nT)\delta(t - nT)$
+\end{prop}
+
+\begin{prop}[Transformée de Fourier]~\\
+  La transformée de Fourier du signal échantilloné vaut $\hat{f}_d(w) =
+  \frac{1}{T} \sum\limits_{k=-\infty}^\infty \hat{f}(w-\frac{2k\pi}{T})$
+\end{prop}
+
+\begin{theorem}[Nyquist]~\\
+  Si $(t)$ est un signal dont la transformée de Fourier à un support inclus dans $[\frac{-\pi}{T},
+  \frac{\pi}{T}]$, on a $f(t) =
+  \sum\limits_{n=-\infty}^{\infty}f(nT)\mathrm{sinc}\(\frac{\pi(t-nT)}{T}\)$\\
+  % TODO remove that
+  La page 26 explique bien cela en une image
+\end{theorem}
+
+\begin{prop}[Préfiltrage]~\\
+  Soit $\mathbf{V}$ l'espace des fonctions ayant dont la transformée de Fourier
+  est inclus dans $[\frac{-\pi}{T}, \frac{\pi}{T}]$.\\
+  La projection orthogonale $P_{\mathbf{V}}f$ qui minimise la distance
+  $||f - P_{\mathbf{V}}f||^2 = \frac{1}{2\pi}\int\limits_{-\infty}^\infty
+  |\hat{f}(w) - \hat{P}_{\mathbf{V}}f(w)|^2dw$
+  est $P_{\mathbf{V}}f(t) = \frac{1}{T}f \star sinc\(\frac{\pi t}{T}\)$
+\end{prop}
+
+\begin{definition}[Généralisation]~\\
+  Les définitions d'homogénéité, de causalité, et de stabilité se généralisent
+  dans le cas discret
+\end{definition}
+
+\begin{prop}[Diracs]~\\
+  Tout signal $f[n]$ peut se noter comme une somme de Diracs : $f[n] = \sum\limits_{p=-\infty}^{\infty}f[p]\delta[n-p]$
+\end{prop}
+
+\begin{definition}[Transformée de Fourier]~\\
+  La transformée de Fourier dans le cas discret est : $\hat{f}(e^{iw}) =
+  \sum\limits_{k=-\infty}^\infty f[k]e^{-iwk}$
+\end{definition}
+
+\begin{prop}[Orthonormalité]~\\
+  La famille $\{e^{ikw}\}$ est une base orthonormale de $\mathbf{L}^2[-\pi,pi]$
+  muni du produit scalaire\\
+  $<a(w),b(w)> = \int\limits_{-\pi}^{\pi}a(w)b^*(w)dw$\\
+  On a donc $f[n] = \frac{1}{2\pi}
+  \int\limits_{-\pi}^{\pi}\hat{f}(e^{iw})e^{iwn}dw$\\
+\end{prop}
+
+\begin{prop}[Formule de Parseval]~\\
+  $\sum\limits_{n=-\infty}^{\infty}f[n]g^*[n] = \frac{1}{2\pi}\int\limits_{-\pi}^{\pi}\hat{f}(e^{iw})\hat{g}(e^{iw})dw$
+\end{prop}
+
+\begin{prop}[Formule de Plancherel]~\\
+  $\sum\limits_{n=-\infty}^\infty |f[n]|^2 = \frac{1}{2\pi}\int\limits_{-\pi}^{\pi} |\hat{f}(e^{iw})|^2dw$
+\end{prop}
+
+\subsection{Cas fini}
+
+\begin{definition}[Convolution]~\\
+  Soient $\tilde{f}$ et $\tilde{h}$ des signaux de N échantillons. On note
+  $f[n]=\tilde{f}[n modulo N]$ et $h[n]=\tilde{h}[n modulo N]$.\\
+  La convolution circulaire se note $f \varoast h[n] = \sum\limits_{p=0}^{N-1}
+  f[p]h[n-p]$.\\
+  Les valeurs propres de l'opérateur sont les exponentielles discrètes
+  $e_k[n] = e^{\frac{i2\pi kn}{N}}$, et forment une base orthogonales
+\end{definition}
+
+\begin{definition}[Transformée de Fourier]~\\
+  La tranformée Fourier dans le cas fini est définie par
+  $\hat{h}[k]=\sum\limits_{p=0}^{N-1}h[p]e^{\frac{-i2\pi kp}{N}}$
+\end{definition}
+
+\begin{definition}[produit scalaire]~\\
+  $<f,g> = \sum\limits_{n=0}^{N-1}f[n]g^*[n]$
+\end{definition}
+
+\begin{prop}[Formules de reconstruction et de Plancherel]~\\
+  $f[n] = \frac{1}{N} \sum\limits_{k=0}^{N-1}\hat{f}[k]e^{\frac{i2\pi kn}{N}}$\\
+  $\sum\limits_{n=0}^{N-1}|f[n]|^2 = \frac{1}{N}\sum\limits_{k=0}^{N-1}|\hat{f}[k]|^2$
+\end{prop}
+
+\begin{definition}[FFT]~\\
+  La transformée de Fourier rapide (FFT) permet de calculer la transformée de
+  Fourier d'un signal fini en $O(N \log_2(N))$\\
+  Voir page 40 pour l'algorithme exacte.
+\end{definition}
+
+\section{Traitement du signal aléatoire}
+
+\begin{definition}[Opérateur de covariance]~\\
+  On note $R_X[n,m] = Cov(X[n],X[m]) = \E((X[n]-\E(X[n]))(X[m]-\E(X[m])))$
+  l'opérateur de covariance.
+\end{definition}
+
+\begin{definition}[Puissance spectrale]~\\
+  Si $X[n]$ est stationnaire au sens large, on peut noter $R_X[n,m] =
+  R_X[n-m]$\\
+  On note $\hat{R}_X(e^{iw})$ la puissance spectrale du processus.
+\end{definition}
+
+\subsection{Filtrage de Wiener}
+
+\begin{definition}[Données bruitées]~\\
+  On note données bruitées la somme de deux processus réels stationnaires
+  $D[n] = X[n] + B[n]$. On suppose que les données $(X)$ et le bruit $(B)$ sont
+  indépendants, et on supposes que $X$ est centré.
+\end{definition}
+
+
+\begin{theorem}[Minimisation d'un estimateur linéaire]~\\
+  Un estimateur linéaire $\tilde{A} = \sum\limits_{n=-\infty}^{\infty}a[k]D[k]$
+  d'une variable aléatoire $A$ minimise
+  $\varepsilon(a) = \E((A-\tilde{A})^2)$ si et seulement si
+  $\E((A-\tilde{A})D[k]) = 0$ pour tout $k$.\\
+  L'erreur minimum est $E(A^2) - \sum\limits_{k=-\infty}^{\infty}a[k]E(AD[k])$
+\end{theorem}
+
+\begin{theorem}[Wiener]~\\
+  L'estimateur linéaire qui minimise l'erreur quadratique moyenne est
+  $\tilde{X} = D \star h$ avec
+  $\hat{h}(e^{iw}) = \frac{\hat{R}_X(e^{iw})}{\hat{R}_X(e^{iw}) + \hat{R}_B(e^{iw}) }$\\
+  L'erreur minimum résultante est\\
+  $\frac{1}{2\pi} \int\limits_0^{2\pi}
+  \frac{\hat{R}_X(e^{iw})\hat{R}_B(e^{iw})}{\hat{R}_X(e^{iw}) + \hat{R}_B(e^{iw})}dw$
+\end{theorem}
+
+\section{Analyse temps-fréquence}
+
+\subsection{Transformée de Fourier à fenêtre}
+
+\begin{definition}[Fenêtre]~\\
+  Une fenêtre est une fonction paire dont le support est centré en 0, et qui est
+  normalisée pour la norme euclidienne.
+\end{definition}
+
+\begin{definition}[Transformée de Fourier à fenêtre]~\\
+  La transformée de Fourier à fenêtre au voisinnage de $u$ à la fréquence $\xi$
+  est définie par\\
+  $Sf(u,\xi) = \int\limits_{-\infty}^{\infty}f(t)g(t-u)e^{-i\xi t}dt$
+\end{definition}
+
+\begin{prop}[Localisation temps-fréquence]~\\
+  On note $g_{u,\xi}(t) = g(t-u)e^{i\xi t}$ une fonction pouvant être
+  interprétée comme une note de musique. Alors, la transformée de Fourier à
+  fenêtre peut être interprétée comme la corrélation entre un son et la note de musique.\\
+  $Sf(u,\xi) = \int\limits_{-\infty}^{\infty}f(t)g^*_{u,\xi}(t)dt$
+\end{prop}
+
+\begin{prop}[Formule de Parseval]~\\
+  En appliquant la formule de Parseval, on obtient\\
+  $Sf(u,\xi) = \frac{1}{2\pi}
+  \int\limits_{-\infty}^{\infty}\hat{f}(w)\hat{g}^*_{u,\xi}(w)dw$\\
+  De plus, $\hat{g}_{u,\xi}(w) = e^{-iu(w-\xi)}\hat{g}(w-\xi)$
+\end{prop}
+
+\begin{definition}[Etalement]~\\
+  On note $\sigma_t^2 = \int\limits_{-\infty}^{\infty}t^2|g(t)|^2dt$ l'étalement temporel\\
+  On note $\sigma_w^2 = \frac{1}{2\pi}\int\limits_{-\infty}^{\infty}w^2|\hat{g}(w)|dw$
+  l'étalement fréquentiel.\\
+  Dans le plan temps-fréquence, on représente $g_{u,\xi}$ par une boite de
+  Heisenberg de taille $\sigma_t \times \sigma_w$
+\end{definition}
+
+\begin{theorem}[Incertitude de Heisenberg]~\\
+  On suppose que $g \in \mathbf{L}^2$ est une fonction centrée en 0, dont la
+  transformée de Fourier est aussi centrée en 0.\\
+  Alors, $\sigma_w\sigma_t \geq \frac{1}{4}$. C'est une égalité ssi $g(t) =
+  ae^{-bt^2}$ avec $(a,b) \in \C^2$
+\end{theorem}
+
+\begin{definition}[Spectrogramme]~\\
+  On peut associer la transformée de Fourier à fenêtre une densité d'énergie
+  appellée spectrogramme, qu'on note $P_Sf(u,\xi) = |Sf(u,\xi)|^2$
+\end{definition}
+
+\begin{theorem}[Reconstruction]~\\
+  Si $f \in \mathbf{L}^2(\R)$, alors \\
+  $f(t) = \frac{1}{2\pi}\int\limits_{-\infty}^{\infty}\int\limits_{-\infty}^{\infty}
+  Sf(u,\xi)g(t-u)e^{i\xi t} d\xi du$ et\\
+  $\int\limits_{-\infty}^\infty |f(t)| =
+  \frac{1}{2\pi}\int\limits_{-\infty}^{\infty}\int\limits_{-\infty}^{\infty}
+  |Sf(u,\xi)|^2d\xi du$
+\end{theorem}
+
+\begin{prop}[Discrétisation]~\\
+  On définit la transformée de Fourier à fenêtre par $g_{m,l}[n] =
+  g[n-m]e^{\frac{i2\pi ln}{N}}$\\
+  On a $\hat{g}_{m,l}[k] = \hat{g}[k-l]e^{-\frac{i2\pi m(k-l)}{N}}$.\\
+  Et $Sf[m,l] = <f,g_{m,l}> = \sum\limits_{n=0}^{N-1}f[n]g[n-m]e^{\frac{-i2\pi l n}{N}}$
+\end{prop}
+
+\subsection{Fréquence instantanée}
+
+\begin{definition}[Fréquence instantanée]~\\
+  On écrit les signaux réels $f$ comme ayant une amplitude $a$ et une phase
+  $\phi$ variant dans le temps :\\
+  $f(t) = a(t) \cos\(\phi(t)\)$\\
+  On définit alors la fréquence instantanée $w(t) = \phi'(t) \geq 0$
+\end{definition}
+
+\begin{prop}[Décomposition]~\\
+  On obtient une telle décomposition en calculant la partie analytique $f_a$ de
+  $f$ définie par :\\
+  $\hat{f}_a(w) = 2\hat{f}(w)$ si $w \geq 0$, $0$ sinon.\\
+  On a $f = \Re(f_a)$, et donc comme $f_a(t) = a(t)e^{i\phi(t)}$, on a $f(t) ) a(t)\cos\(\phi(t)\)$
+\end{prop}
+
+\begin{definition}[Modèle de sons additifs]~\\
+  On peut modéliser les sons musicaux et les phonèmes comme des sommes de
+  partielles sinusoïdals :\\
+  $f(t) = \sum\limits_{k=0}^K a_k(t) \cos\(\phi_k( t)\)$
+\end{definition}
+
+\begin{prop}[Compression]~\\
+  Pour comprimer un signal d'un facteur $\alpha$ dans le temps, on pose:\\
+  $g(t) = \sum\limits_{k=0}^K a_k(\alpha t) \cos\(\frac{1}{\alpha}\phi_k(\alpha t)\)$
+\end{prop}
+
+\begin{theorem}~\\
+  Si les variations de $a(t)$ et $\phi(t)$ sont négligeables sur le support
+  $[u-s/2,u+s/2]$ de $g(t-u)$ et que $\phi'(u) \geq \delta w$ alors pour tout
+  $\xi \geq 0$ on a\\
+  $Sf(u,\xi) \simeq \frac{1}{2}a(u)e^{i(\phi(u)-\xi u)}\hat{g}(\xi - \phi'(u))$
+\end{theorem}
+
+\subsection{Crêtes}
+
+\section{Information et Codage}
+
+\subsection{Complexité et entropie}
+
+\begin{definition}[Notation]~\\
+  Soit $X$ une suite aléatoire de $n$ symboles d'un alphabet $A$ de taille $k$,
+  où les variables aléatoires sont de même lois.\\
+  On note $p(a_k) = \Pr(X_i = a_k)$
+\end{definition}
+
+\begin{definition}[Entropie]~\\
+  On note l'entropie $H = -\sum\limits_{k=1}^{K}p(a_k)\log_2(p(a_k)) = -\E(\log_2p(X_i))$
+\end{definition}
+
+\begin{theorem}~\\
+  Si les $X_i$ sont des variables indépendantes de même probabilité, alors\\
+  $-\frac{1}{n}\log_2\(p(X_1,...,X_n)\) \ra H$ presque surement
+\end{theorem}
+
+\begin{definition}[Ensemble typique]~\\
+  On appelle ensemble typique $T_{\varepsilon}^n$ relativement à $p(x)$
+  l'ensemble des suites $(x_1,...,x_n) \in A^n$ telles que
+  $2^{-n(H+\varepsilon)} \leq p(x_1,...,x_n) \leq 2^{-n(H-\varepsilon)}$\\
+  On note $|T_{\varepsilon}^n$ son cardinal
+\end{definition}
+
+\begin{prop}[Ensembles typiques]~\\
+  Soit $\varepsilon >0$
+  \begin{itemize}
+  \item[-] Si $(x_1,...,x_n) \in T_{\varepsilon}^n$, $
+    $alors $H-\varepsilon \leq -\frac{1}{n}\log_2\(p(x_1,...,x_n)\) \leq
+    H+\varepsilon$
+  \item[-] Lorsque $n$ est suffisament grand, $\Pr\((X_1,...,X_n)\in
+    T_{\varepsilon}^n\) > 1-\varepsilon$
+  \item[-] Lorsque $n$ est suffisament grand,
+    $2^{n(H-\varepsilon)} \leq |T_{\varepsilon}^n| \leq 2^{n(H+\varepsilon)}$
+  \end{itemize}
+\end{prop}
+
+\begin{definition}[Codage $\varepsilon$-typique]~\\
+  Un codage $\varepsilon$-typique code les éléments de $T_{\varepsilon}^n$ avec
+  $\lfloor n(H+\varepsilon) \rfloor + 2$ bits, et les autres avec $n\log_2(K) +
+  2$ bits\\
+  On note $R$ le nombre moyen de bits pour coder chaque symbole.
+\end{definition}
+
+\begin{theorem}~\\
+  Il existe $C > 0$ tel que pour tout $\varepsilon >0$, et $n$ suffisament
+  grand, le nombre moyen $R$ de bits par symbole d'un codage $\varepsilon$
+  typique satisfait $R \leq H + C\varepsilon$
+\end{theorem}
+
+\subsection{Codage entropique}
+
+\begin{prop}[nombre moyen de bits]~\\
+  Le nombre moyen de bits nécessaire pour coder les symboles d'une suite de
+  variables aléatoires $X_1,...,X_n$ de même probabilité $p(x)$ est $R =
+  \sum\limits_{k=1}^{K}l_kp(a_k)$ avec $l_k$ la longueur du code binaire $w_k$
+  associé à $a_k$.
+\end{prop}
+
+\begin{prop}[Condition du préfixe]~\\
+  Une suite de mots binaires se décode de façon unique si et seulement si aucun
+  mot binaire n'est préfixe d'un autre mot binaire.
+\end{prop}
+
+\begin{theorem}[Shannon]~\\
+  Le nombre moyen de bits d'un code ayant la propriété du préfixe satisfait
+  $R \geq H$, et il existe un code ayant la propriété du préfixe tel que
+  $R \leq H+1$
+\end{theorem}
+
+\begin{theorem}[Inégalité de Kraft]~\\
+  Tout code ayant la propriété du préfixe satisfait
+  $\sum\limits_{k=1}^K 2^{-l_k} \leq 1$
+\end{theorem}
+
+\begin{prop}[Codage par blocs]~\\
+  Le codage par bloc consiste à coder les mots par blocs de $n$ éléments, qui
+  sont donc dans l'alphabet $A^n$ de taille $K^n$.\\
+  Le nombre moyen de bits d'un codage par bloc ayant la propriété du préfixe satisfait
+  $R \geq H$, et il existe un code ayant la propriété du préfixe tel que
+  $R \leq H+\frac{1}{n}$
+\end{prop}
+
+\begin{prop}[Codage de Huffman]~\\
+  Le codage de Huffman qui minimise $R$.\\
+  On a donc $H \leq R \leq H+1$
+\end{prop}
+
+\subsection{Quantificateur scalaire}
+
+\begin{definition}[Quantificateur scalaire]~\\
+On est ici dans le cas ou les valeurs que l'ont doit coder sont des valeurs
+réelles quelquonques.\\
+L'erreur d'une approximation vaut $\E\((X-\tilde{X})^2\)$.
+On note $p(x)$ la densité de probabilité de $X$.
+Un quantificateur scalaire sépare l'axe réel en $K$ intervalles,
+$\{[y_{k-1},y_{k}]\}$, et associe à chaque intervalle $[y_{k-1},y_{k}]$ une valeur $Q(x) = a_k$
+\end{definition}
+
+\begin{definition}[Quantification haute résolution]~\\
+  On dit que le quantificateur a une haute résolution si $p(x)$ peut être
+  approximée par une constante sur un intervalle. En notant $y_k-y_{k-1}$, on a
+  $p(x) = \frac{p_k}{\Delta_k}$ pour $x \in [y_{k-1},y_{k}]$ avec $p_k = \Pr(X \in [y_{k-1},y_{k}])$
+\end{definition}
+
+\begin{prop}[Erreur minimale possible]~\\
+  Pour un quantificateur haute résolution, l'erreur D minimum obtenue en
+  optimisant la position des $a_k$ est
+  $D = \frac{1}{12}\sum\limits_{k=1}^{K}p_k \Delta_k^2$\\
+  Ce minimum est obtenu en posant $a_k = \frac{y_{k-1}+y_k}{2}$\\
+\end{prop}
+
+\begin{definition}[Quantification uniforme]~\\
+  Une quantification est uniforme si $\Delta_k = \Delta$ une constante.\\
+  Dans ce cas, l'erreur minimale possible est $D = \frac{\Delta^2}{12}$
+\end{definition}
+
+
+\begin{theorem}[Optimalité de la quantification uniforme]~\\
+  On note $H_d = -\int\limits_{-\infty}^{\infty}p(x) \log_2\(p(x)\)dx$
+  l'entropie différentielle.\\
+  L'entropie de tout quantificateur de haute résolution vérifie
+  $H \leq H_d - \frac{1}{2}\log_2(12D)$.\\
+  Le minimum est atteint ssi la quantification est uniforme
+\end{theorem}
+
+\section{Compression de Signaux}
+
+\subsection{Codage dans une base orthogonale}
+
+\begin{definition}[Décomposition]~\\
+On décompose un vecteur aléatoire $Y$ sur une base orthogonale $g_m$ :\\
+$Y[n] = \sum\limits_{m=0}^{N-1}A[m]g_m[n]$\\
+où les coefficients de décomposition
+$A[m]$ sont des variables aléatoires. On supposeras par la suite que les $A[m]$
+sont centrés
+\end{definition}
+
+
+\begin{definition}[Erreur moyenne]~\\
+  En approximant $A$ par $\tilde{A}$, on obtient une erreur moyenne :\\
+  $\E(||Y-\tilde{Y}||^2) = \sum\limits_{m=0}^{N-1}\E(|A[m]-\tilde{A}[m]|^2)$\\
+  Par la suite, on note $D_m = \E(|A[m]-\tilde{A}[m]|^2$ (l'erreur totale
+  devient donc $D = \sum\limits_{m=0}^{N-1}D_m$)
+\end{definition}
+
+\begin{prop}~\\
+  On a $D_m = \frac{\Delta_m^2}{12}$, et $R_m = H_d(X) - \log_2(\Delta_m)$
+\end{prop}
+
+\begin{theorem}[Minimisation de $\bar{R}$]~\\
+  Pour un quantification haute résolution et une erreur totale $D$ donnée, on
+  minimise $\bar{R} = R/n$ par :\\
+  $\Delta_m^2 = \frac{12D}{N}$,\\
+  auquel cas $D(\bar{R}) = \frac{N}{12}2^{2\bar{H}_d-2\bar{R}}$,\\
+  où $\bar{H}_d = \frac{1}{N}\sum\limits_{n=0}^{N-1}H_d(A[m])$ est l'entropie différentielle moyenne.
+\end{theorem}
+
+\end{document}
