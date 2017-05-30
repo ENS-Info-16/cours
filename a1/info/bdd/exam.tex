@@ -17,6 +17,7 @@
 %\usetikzlibrary{shapes.geometric,calc}
 \usepackage{algorithm2e}
 \usepackage{multicol}
+\usepackage{tabularx}
 \newcommand{\sep}{\begin{center}
     \pgfornament[width=0.25\linewidth]{84}
 \end{center}}
@@ -458,6 +459,70 @@
     \end{defi}
 
     \section{Évaluation et optimisation des requêtes}
+
+    \begin{defi}[Coût de requêtes] Plusieurs critères :\begin{itemize}
+        \item CPU : ignorés car négligeable devant accès disque
+        \item Communication réseau
+        \item Accès disque : seek ($t_S$), lecture ($t_T$), écriture
+    \end{itemize}
+    \end{defi}
+
+    \begin{ex}[Algorithmes et coûts]:\\
+        \begin{tabularx}{0.5\textwidth}{lXr}
+            \hline \textbf{id} & \textbf{Algorithme} & \textbf{Coût} \\
+            \hline
+            A1  & Linear search & $b_r * t_T + t_S$ \\
+            A2  & primary index, equality on key & $(h_i + 1) * (t_T + t_S)$ \\
+            A3  & primary index, equality on nonkey & $h_i * (t_T + t_S) + t_S + t_T * b$ \\ 
+            A4  & secondary index, equality on nonkey & $(h_i + 1) * (t_T + t_S)$ \\
+            A5  & primary index, comparison & \\
+            A6  & secondary index, comparison & \\
+            A7  & conjunctive selection using one index & \\
+            A8  & conjunctive selection using composite index & \\
+            A9  & conjunctive selection by intersection of identifiers & \\
+            A10 & disjunctive selection by union of identifiers & \\
+            X   & nested loop join & $(n_r * b_S + b_r) * t_T + (n_r + b_r) * t_S$ \\
+            X   & block nested loop join & $(b_r*b_s + b_r) * t_T + 2 * b_r * t_S$ \\
+            X   & indexed nested loop join & $b_r * (t_T + t_S) + n_r * c$ \\
+            X   & merge join & $(b_r + b_s) * t_T + (\lceil \frac{b_r}{M} \rceil
+                                                     + \lceil \frac{b_s}{M} \rceil) * t_S$ \\
+            X   & hash join & \\
+            \hline
+        \end{tabularx}
+
+        Avec $b_r$ le nombre de blocks contenant des tuples de la relation $r$,
+        $b$ le nombre de blocks contenant des tuples matchant la requête, $n_r$
+        le nombre de tuples dans la relation $r$, $c$ est le coût d'une
+        lecture complète de l'index, $M$ la moitié de la mémoire et
+        $h_i$ le nombre de blocks nécessaire pour lire une entrée de l'index.
+    \end{ex}
+
+    \begin{prop}[Règles d'équivalence]:\\
+        \[\begin{array}{ccc}
+                \sigma_{\theta_1\cup\theta_2}(E) = \sigma_{\theta_1}(\sigma_{\theta_2}(E))
+             &  \sigma_{\theta_1}(\sigma_{\theta_2}(E)) = \sigma_{\theta_2}(\sigma_{\theta_1}(E))
+             \\ \Pi_{L_1}(\ldots \Pi_{L_n}(E)\ldots  ) = \Pi_{L_1}(E)
+             &  \sigma_\theta(E_1\times E_2) = E_1\bowtie_\theta E_2
+             \\ \sigma_{\theta_1}(E_1\bowtie_{\theta_2} E_2 = E_1\bowtie_{\theta_1\wedge\theta_2} E_2
+             &  E_1\bowtie_\theta E_2 = E_2\bowtie_\theta E_1
+             \\ (E_1\bowtie E2)\bowtie E_3 = E_1 \bowtie (E_2\bowtie E_3)
+             &  (E_1\bowtie_{\theta_1} E_2)\bowtie_{\theta_2\wedge\theta_3} E_3
+                 = E_1 \bowtie_{\theta_1\wedge\theta_3} (E_2\bowtie_{\theta_2} E_3)
+             \\
+        \end{array}\]
+        % TODO add other equivalence rules with conditions
+    \end{prop}
+
+    \section{Stockage et indexation}
+
+    \begin{defi}[Arbre $B^+$]
+        $(\lceil\frac{n}{2}\rceil,n)$-arbre, avec la racine ayant entre $0$ et $n-1$
+        valeurs. De plus, les valeurs sont toutes dans les feuilles. Les éléments dans les
+        noeuds sont majorant stricts à gauche et non-strict à droite.
+    \end{defi}
+
+    \section{Concurrence et transactions}
+    %TODO
 
 \end{multicols}
 \end{document}
