@@ -17,15 +17,43 @@
 %\usetikzlibrary{shapes.geometric,calc}
 \usepackage{algorithm2e}
 \usepackage{multicol}
-\newcommand{\sep}{\begin{center}
-    \pgfornament[width=0.25\linewidth]{84}
-\end{center}}
-\newcommand{\edornament}{\begin{center}
-    \pgfornament[width=0.25\linewidth]{49}
-\end{center}}
+\usepackage{tabularx}
+\usepackage{listings}
 \newcommand{\seg}[2]{\llbracket #1, #2 \rrbracket}
 
 \MakeRobust{\overrightarrow}
+
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+
+\lstset{ %
+  backgroundcolor=\color{white},      % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}; should come as last argument
+  basicstyle=\footnotesize,           % the size of the fonts that are used for the code
+  breakatwhitespace=false,            % sets if automatic breaks should only happen at whitespace
+  breaklines=true,                    % sets automatic line breaking
+  captionpos=b,                       % sets the caption-position to bottom
+  commentstyle=\color{cyan},          % comment style
+  deletekeywords={...},               % if you want to delete keywords from the given language
+  escapeinside={\%*}{*)},             % if you want to add LaTeX within your code
+  extendedchars=true,                 % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+  frame=L,	                          % adds a frame around the code
+  keepspaces=true,                    % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+  keywordstyle=\bf\color{green!40!black},      % keyword style
+  language=SQL,                       % the language of the code
+  morekeywords={*,...},               % if you want to add more keywords to the set
+  %numbers=left,                      % where to put the line-numbers; possible values are (none, left, right)
+  %numbersep=5pt,                     % how far the line-numbers are from the code
+  %numberstyle=\bf\tiny\color{blue},  % the style that is used for the line-numbers
+  rulecolor=\color{black},            % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+  showspaces=false,                   % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+  showstringspaces=true,              % underline spaces within strings only
+  showtabs=false,                     % show tabs within strings adding particular underscores
+  stepnumber=1,                       % the step between two line-numbers. If it's 1, each line will be numbered
+  stringstyle=\color{mymauve},        % string literal style
+  tabsize=4,	                      % sets default tabsize to 2 spaces
+  title=\lstname                      % show the filename of files included with \lstinputlisting; also try caption instead of title
+}
 
 \newcommand{\vc}[1]{\overrightarrow{#1}}
 \newcommand{\A}{\mathscr{A}}
@@ -113,7 +141,8 @@
         \end{tabular}
     \end{defi}
 
-    \begin{defi}[Requêtes] \begin{itemize}
+    \begin{defi}[Requêtes] Plusieurs requêtes~:
+    \begin{itemize}
         \item Requêtes conjonctives : $x_a, x_b \leftarrow R_1(x, x_a), R_2(x', x_b, x''), R_3(x_b, x'')$
         \item Calcul conjonctif : $\{x_a, x_b | \exists x \exists x' \exists x''(R_1(x, x_a)\wedge R_2(x', x_b, x'')\wedge R_3(x_b, x'')) \}$
         \item Algèbre PSJR : projection, sélection, jointure, renommage.
@@ -458,6 +487,147 @@
     \end{defi}
 
     \section{Évaluation et optimisation des requêtes}
+
+    \begin{defi}[Coût de requêtes] Plusieurs critères :\begin{itemize}
+        \item CPU : ignorés car négligeable devant accès disque
+        \item Communication réseau
+        \item Accès disque : seek ($t_S$), lecture ($t_T$), écriture
+    \end{itemize}
+    \end{defi}
+
+    \begin{ex}[Algorithmes et coûts]:\\
+        \begin{tabularx}{0.5\textwidth}{lXr}
+            \hline \textbf{id} & \textbf{Algorithme} & \textbf{Coût} \\
+            \hline
+            A1  & Linear search & $b_r * t_T + t_S$ \\
+            A2  & primary index, equality on key & $(h_i + 1) * (t_T + t_S)$ \\
+            A3  & primary index, equality on nonkey & $h_i * (t_T + t_S) + t_S + t_T * b$ \\ 
+            A4  & secondary index, equality on nonkey & $(h_i + 1) * (t_T + t_S)$ \\
+            A5  & primary index, comparison & \\
+            A6  & secondary index, comparison & \\
+            A7  & conjunctive selection using one index & \\
+            A8  & conjunctive selection using composite index & \\
+            A9  & conjunctive selection by intersection of identifiers & \\
+            A10 & disjunctive selection by union of identifiers & \\
+            X   & nested loop join & $(n_r * b_S + b_r) * t_T + (n_r + b_r) * t_S$ \\
+            X   & block nested loop join & $(b_r*b_s + b_r) * t_T + 2 * b_r * t_S$ \\
+            X   & indexed nested loop join & $b_r * (t_T + t_S) + n_r * c$ \\
+            X   & merge join & $(b_r + b_s) * t_T + (\lceil \frac{b_r}{M} \rceil
+                                                     + \lceil \frac{b_s}{M} \rceil) * t_S$ \\
+            X   & hash join & \\
+            \hline
+        \end{tabularx}
+
+        Avec $b_r$ le nombre de blocks contenant des tuples de la relation $r$,
+        $b$ le nombre de blocks contenant des tuples matchant la requête, $n_r$
+        le nombre de tuples dans la relation $r$, $c$ est le coût d'une
+        lecture complète de l'index, $M$ la moitié de la mémoire et
+        $h_i$ le nombre de blocks nécessaire pour lire une entrée de l'index.
+    \end{ex}
+
+    \begin{prop}[Règles d'équivalence]:\\
+        \[\begin{array}{ccc}
+                \sigma_{\theta_1\cup\theta_2}(E) = \sigma_{\theta_1}(\sigma_{\theta_2}(E))
+             &  \sigma_{\theta_1}(\sigma_{\theta_2}(E)) = \sigma_{\theta_2}(\sigma_{\theta_1}(E))
+             \\ \Pi_{L_1}(\ldots \Pi_{L_n}(E)\ldots  ) = \Pi_{L_1}(E)
+             &  \sigma_\theta(E_1\times E_2) = E_1\bowtie_\theta E_2
+             \\ \sigma_{\theta_1}(E_1\bowtie_{\theta_2} E_2 = E_1\bowtie_{\theta_1\wedge\theta_2} E_2
+             &  E_1\bowtie_\theta E_2 = E_2\bowtie_\theta E_1
+             \\ (E_1\bowtie E2)\bowtie E_3 = E_1 \bowtie (E_2\bowtie E_3)
+             &  (E_1\bowtie_{\theta_1} E_2)\bowtie_{\theta_2\wedge\theta_3} E_3
+                 = E_1 \bowtie_{\theta_1\wedge\theta_3} (E_2\bowtie_{\theta_2} E_3)
+             \\
+        \end{array}\]
+        % TODO add other equivalence rules with conditions
+    \end{prop}
+
+    \section{Stockage et indexation}
+
+    \begin{defi}[Arbre $B^+$]
+        $(\lceil\frac{n}{2}\rceil,n)$-arbre, avec la racine ayant entre $0$ et $n-1$
+        valeurs. De plus, les valeurs sont toutes dans les feuilles. Les éléments dans les
+        nœuds sont majorant stricts à gauche et non strict à droite.
+    \end{defi}
+
+    \section{Concurrence et transactions}
+
+    \begin{defi}[Opérations conflictuelles]
+        Deux opérations $a$ et $a'$ exécutées  par deux transactions différentes
+        sont dites conflictuelles si les exécutions $a; a'$ et $a'; a$ sont 
+        susceptibles de conduire à des résultats différents.
+
+        \begin{tabular}{|c|c|c|}
+            \hline        & $R(X)$ & $W(X)$ \\
+            \hline $R(X)$ & NON    & OUI    \\
+            \hline $W(X)$ & OUI    & OUI    \\
+            \hline
+        \end{tabular}
+    \end{defi}
+
+    \begin{defi}[Équivalence] Un ordonnancement $A$ est équivalent à un ordonnancement
+        $A$ ssi le résultat produit et observé est le même.
+    \end{defi}
+
+    \begin{prop} Si $A'$ est un ordonnancement produit à partir d'un ordonnancement $A$
+        en ne permutant que des opérations non conflictuelles alors $A$ et $A'$
+        sont équivalentes.
+    \end{prop}
+
+    \begin{defi}[Sérialisabilité]
+        Un ordonnancement est sérialisable ssi il peut être transformé en ordonnancement
+        sériel par permutations successives d'opérations ne constituant pas une
+        paire d'opérations conflictuelles.
+    \end{defi}
+
+    \begin{defi}[Estampillage]
+        À chaque transaction $T_i$ on associe un numéro distinct $E(T_i)$ appelé
+        estampille, donné de manière croissante selon la date de début de $T_i$.
+        On marque chaque uplet de l'estampille de la transaction ayant effectué
+        la dernière lecture et la dernière écriture. Si une transaction essaye
+        d'accéder à un uplet ayant une estampille d'écriture plus récente que
+        la sienne, on annule la transaction.
+    \end{defi}
+
+    \begin{defi}[Verrou à deux phases]
+        On pose des verrous S (shared) et X (exclusif) sur les tuples, et on
+        se met en pause lorsqu'on essaye de lire ou écrire un tuple en X.
+    \end{defi}
+
+    \begin{lstlisting}
+CREATE TABLE stop_times
+    ( trip_id        VARCHAR(64) NOT NULL -- REFERENCES trips(trip_id)
+    , arrival_time   CHAR(8) NOT NULL
+    -- ...
+    , drop_off_type  INTEGER
+    , UNIQUE(trip_id, stop_sequence)
+    );
+\copy stop_times FROM 'stop_times.txt' HEADER CSV;
+
+WITH RECURSIVE T(dist, stop_id) AS (
+    -- Initialisation
+    SELECT 0 AS dist, S1.stop_id AS stop_id
+    FROM stops AS S1, stops AS S2
+    WHERE S1.parent_station = S2.stop_id
+        -- ...
+  UNION
+    SELECT DISTINCT T.dist + 1 AS dist, S.stop_id AS stop_id
+    FROM routes AS R, trips AS TR, stop_times AS ST1,
+	 stop_times AS ST2, stops AS S, T
+    WHERE ST1.trip_id = TR.trip_id
+        -- ...
+)
+SELECT *
+FROM
+  (
+    SELECT DISTINCT MIN(T.dist) AS dist, S1.stop_name AS stop_name
+    FROM T, stops AS S1, stops AS S2
+    WHERE S1.stop_id = S2.parent_station  -- S1 is the area of S2
+    GROUP BY S1.stop_id                   -- We regroup all stations in the same area
+  ) AS R
+ORDER BY dist ASC, stop_name
+;
+
+    \end{lstlisting}
 
 \end{multicols}
 \end{document}
